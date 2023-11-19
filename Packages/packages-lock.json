@@ -188,7 +188,7 @@
     },
     "com.unity.xr.arcore": {
       "version": "5.0.7",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.xr.arfoundation": "5.0.7",
