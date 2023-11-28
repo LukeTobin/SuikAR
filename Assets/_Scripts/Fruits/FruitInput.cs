@@ -1,3 +1,5 @@
+using System;
+using SuikAR.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,12 +13,23 @@ namespace SuikAR.Fruits
 
         [Header("Properties")] 
         [SerializeField] private float fruitSpawnOffset = 0.5f;
+        [SerializeField] private float touchCooldownTime = 0.4f;
 
         private Controls controls;
-        
+        private bool touchCooldown = false;
+
         private void Awake()
         {
             controls = new Controls();
+        }
+
+        private void Initialize(GameObject ctxObject)
+        {
+            controls.Default.Enable();
+
+            // Initialize a touch cooldown for sensitive phone screens
+            touchCooldown = true;
+            Invoke(nameof(ResetCooldown),touchCooldownTime);
 
             controls.Default.Touch.performed += ctx =>
             {
@@ -29,15 +42,14 @@ namespace SuikAR.Fruits
 
         private void OnPress(Vector3 screenPosition)
         {
-            // Get the forward direction of the camera
+            if (touchCooldown) return;
+            
+            // Calculate Spawn Position
             Vector3 cameraForward = xrCamera.transform.forward;
-
-            // Set the distance from the camera that you want to spawn the object
             float spawnDistance = fruitSpawnOffset;
-
-            // Calculate the position in front of the camera
             Vector3 spawnPosition = xrCamera.transform.position + (cameraForward * spawnDistance);
-
+            
+            // Get the next fruit to spawn
             FruitObject spawnedObject = fruitManager.GetCurrentFruit();
             if (spawnedObject != null)
             {
@@ -46,15 +58,22 @@ namespace SuikAR.Fruits
                     
                 spawnedObject.ApplyForce(spawnPosition);
             }
+            
+            // Cooldown flag to avoid screen bugs or spam abuse
+            touchCooldown = true;
+            Invoke(nameof(ResetCooldown),touchCooldownTime);
         }
+
+        private void ResetCooldown() => touchCooldown = false;
 
         private void OnEnable()
         {
-            controls.Default.Enable();
+            EventManager.Subscribe<GameObject>(EventManager.Event.OnGameStarted, Initialize);
         }
 
         private void OnDisable()
         {
+            EventManager.Unsubscribe<GameObject>(EventManager.Event.OnGameStarted, Initialize);
             controls.Default.Disable();
         }
     }

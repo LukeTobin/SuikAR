@@ -1,5 +1,6 @@
 using SuikAR.Events;
 using SuikAR.Fruits;
+using SuikAR.Systems;
 using UnityEngine;
 using TMPro;
 
@@ -10,38 +11,34 @@ namespace SuikAR.UI
         [SerializeField] private TMP_Text currentScoreText;
         [SerializeField] private TMP_Text highScoreText;
 
-        private int Score
+        private void InitializeScoreUI(GameObject ctxObject)
         {
-            get => score;
-            set
-            {
-                score = value;
-                currentScoreText.text = value.ToString();
-
-                if (score > highscore)
-                {
-                    highscore = score;
-                    highScoreText.text = score.ToString();
-                }
-            }
+            currentScoreText.text = "0";
+            highScoreText.text = PlayerPrefs.GetInt("Highscore", 0).ToString();
+        }
+        
+        private void UpdateScoreUI(int score)
+        {
+            currentScoreText.text = score.ToString();
         }
 
-        private int score = 0;
-        private int highscore = 0;
-
-        private void AddScore(FruitCombineData fruitData)
+        private void UpdateHighscoreUI(int highscore)
         {
-            Score += fruitData.currentFruit.combineScore;
+            highScoreText.text = highscore.ToString();
         }
         
         private void OnEnable()
         {
-            EventManager.Subscribe<FruitCombineData>(EventManager.Event.OnFruitCombine, AddScore);
+            EventManager.Subscribe<GameObject>(EventManager.Event.OnGameStarted, InitializeScoreUI);
+            EventManager.Subscribe<int>(EventManager.Event.OnScored, UpdateScoreUI);
+            EventManager.Subscribe<int>(EventManager.Event.OnNewHighscore, UpdateHighscoreUI);
         }
 
         private void OnDisable()
         {
-            EventManager.Unsubscribe<FruitCombineData>(EventManager.Event.OnFruitCombine, AddScore);
+            EventManager.Unsubscribe<GameObject>(EventManager.Event.OnGameStarted, InitializeScoreUI);
+            EventManager.Unsubscribe<int>(EventManager.Event.OnScored, UpdateScoreUI);
+            EventManager.Unsubscribe<int>(EventManager.Event.OnNewHighscore, UpdateHighscoreUI);
         }
     }
 }

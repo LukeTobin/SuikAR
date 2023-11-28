@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 483ebe5c3f7ad5f46b7a67f6247f87f5, type: 3}
   m_Name: 4
   m_EditorClassIdentifier: 
-  color: {r: 0.9458718, g: 0.75800997, b: 0.9622642, a: 1}
-  scale: 0.4
+  color: {r: 1, g: 0.72156864, b: 0.003921569, a: 1}
+  scale: 0.15
   combineFruit: {fileID: 11400000, guid: 0b8c3875ecc417843ba9cb1bd8d647f8, type: 2}
   combineScore: 10

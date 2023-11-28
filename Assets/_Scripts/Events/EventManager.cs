@@ -9,8 +9,11 @@ namespace SuikAR.Events
 
         public enum Event
         {
+            OnGameStarted,
             OnFruitCombine,
-            OnFruitQueued
+            OnFruitQueued,
+            OnScored,
+            OnNewHighscore
         }
         
         public static void Subscribe<T>(Event eventType, Action<T> listener)

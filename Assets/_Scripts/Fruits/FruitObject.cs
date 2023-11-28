@@ -9,17 +9,20 @@ namespace SuikAR.Fruits
     public class FruitObject : MonoBehaviour
     {
         public Fruit Fruit { get; private set; }
-        public List<FruitObject> Matched = new List<FruitObject>();
-
-        private Rigidbody _rigidbody;
-        private MeshRenderer _renderer;
+        [HideInInspector] public List<FruitObject> Matched = new List<FruitObject>();
         
         [Header("Settings")]
+        [Tooltip("How much force is applied when spawning the fruit object in front of the camera")]
         [SerializeField] private float projectionForce = 40f;
+        [Tooltip("How many of these fruit objects need to touch before combining")]
         [SerializeField] private int matchAmount = 3;
         
         [Header("Debug")] 
         [SerializeField] private Fruit _fruit;
+        [SerializeField] private float maxSpeed;
+        
+        private Rigidbody _rigidbody;
+        private MeshRenderer _renderer;
 
         private void Awake()
         {
@@ -30,6 +33,11 @@ namespace SuikAR.Fruits
             {
                 Initialize(_fruit, transform.position);
             }
+        }
+
+        private void FixedUpdate()
+        {
+            ClampMaxSpeed();
         }
 
         public void Initialize(Fruit fruit, Vector3 position)
@@ -48,7 +56,15 @@ namespace SuikAR.Fruits
 
         public void ApplyForce(Vector3 direction)
         {
-            _rigidbody.AddForce(direction * projectionForce, ForceMode.Force);
+            _rigidbody.AddForce(direction * projectionForce);
+        }
+
+        private void ClampMaxSpeed()
+        {
+            if (_rigidbody.velocity.magnitude > maxSpeed)
+            {
+                _rigidbody.velocity = Vector3.ClampMagnitude(_rigidbody.velocity, maxSpeed);
+            }
         }
         
         private void OnCollisionEnter(Collision other)
